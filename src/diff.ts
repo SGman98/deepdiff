@@ -11,7 +11,7 @@ export function diffObject(
   obj1: object,
   obj2: object,
   path: string,
-  options: IDiffOptions
+  options: IDiffOptions,
 ): IDiffItem[] {
   const keys1 = new Set(Object.keys(obj1));
   const keys2 = new Set(Object.keys(obj2));
@@ -67,7 +67,7 @@ export function diffArray<T>(
   obj1: T[],
   obj2: T[],
   path: string,
-  options: IDiffOptions
+  options: IDiffOptions,
 ): IDiffItem[] {
   const hash1 = obj1.map(options.hashObject);
   const hash2 = obj2.map(options.hashObject);
@@ -108,7 +108,7 @@ export function diffAny(
   obj1: any,
   obj2: any,
   path: string,
-  options: IDiffOptions
+  options: IDiffOptions,
 ): IDiffItem[] {
   const type1 = getType(obj1);
   const type2 = getType(obj2);
@@ -117,6 +117,14 @@ export function diffAny(
     result.push(...diffObject(obj1 as any, obj2 as any, path, options));
   } else if (type1 === type2 && type1 === 'array') {
     result.push(...diffArray(obj1 as any, obj2 as any, path, options));
+  } else if (type1 === type2 && type1 === 'date') {
+    if (obj1.getTime() !== obj2.getTime())
+      result.push({
+        op: DiffOperation.REPLACE,
+        path,
+        oldVal: obj1,
+        newVal: obj2,
+      });
   } else if (obj1 !== obj2) {
     result.push({
       op: DiffOperation.REPLACE,

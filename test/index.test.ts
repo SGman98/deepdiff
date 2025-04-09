@@ -3,6 +3,7 @@ import { findCommonItems } from '../src/diff';
 
 const oldDate = new Date('09-09-2024');
 const newDate = new Date('09-10-2025');
+const oldDate2 = new Date('09-09-2024');
 
 it('should equal', () => {
   const diff = deepdiff(
@@ -10,11 +11,13 @@ it('should equal', () => {
       a: [1, 2, 3, 5],
       b: 1,
       c: oldDate,
+      d: oldDate,
     },
     {
       a: [2, 3, 4, 5],
       b: 2,
       c: newDate,
+      d: oldDate2,
     },
   );
   expect(diff).toEqual([
