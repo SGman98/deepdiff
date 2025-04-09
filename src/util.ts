@@ -15,6 +15,7 @@ export type IDataType =
   | 'array'
   | 'null'
   | 'object'
+  | 'date'
   | 'string'
   | 'undefined'
   | 'number'
@@ -30,6 +31,7 @@ export type IDiffOptions = {
 export function getType(obj: any): IDataType {
   if (Array.isArray(obj)) return 'array';
   if (obj === null) return 'null';
+  if (obj instanceof Date) return 'date';
   let type = typeof obj;
   if (type === 'bigint') type = 'number';
   return type;
@@ -59,7 +61,7 @@ export function prestringify(obj: any): void {
     const str = tokens.join('');
     makeStringified(obj, str);
   }
-  if (obj && typeof obj === 'object') {
+  if (obj && typeof obj === 'object' && !(obj instanceof Date)) {
     const keys = Object.keys(obj).sort();
     const tokens = ['{'];
     for (let i = 0; i < keys.length; i += 1) {
@@ -71,6 +73,10 @@ export function prestringify(obj: any): void {
     }
     tokens.push('}');
     const str = tokens.join('');
+    makeStringified(obj, str);
+  }
+  if (obj instanceof Date) {
+    const str = obj.toString();
     makeStringified(obj, str);
   }
 }

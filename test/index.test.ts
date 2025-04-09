@@ -1,19 +1,36 @@
 import { deepdiff } from '../src';
 import { findCommonItems } from '../src/diff';
 
+const oldDate = new Date('09-09-2024');
+const newDate = new Date('09-10-2025');
+
 it('should equal', () => {
-  const diff = deepdiff({
-    a: [1, 2, 3, 5],
-    b: 1,
-  }, {
-    a: [2, 3, 4, 5],
-    b: 2,
-  });
+  const diff = deepdiff(
+    {
+      a: [1, 2, 3, 5],
+      b: 1,
+      c: oldDate,
+    },
+    {
+      a: [2, 3, 4, 5],
+      b: 2,
+      c: newDate,
+    },
+  );
   expect(diff).toEqual([
     { op: 'delete', path: '/a/0', oldVal: 1 },
     { op: 'insert', path: '/a/3', newVal: 4 },
     {
-      op: 'replace', path: '/b', oldVal: 1, newVal: 2,
+      op: 'replace',
+      path: '/b',
+      oldVal: 1,
+      newVal: 2,
+    },
+    {
+      op: 'replace',
+      path: '/c',
+      oldVal: oldDate,
+      newVal: newDate,
     },
   ]);
 });
@@ -37,28 +54,29 @@ it('find common items for empty array', () => {
 });
 
 it('ignore order of object keys', () => {
-  const diff = deepdiff({
-    a: 1,
-    b: 2,
-    c: 3,
-  }, {
-    c: 3,
-    b: 2,
-    a: 1,
-  });
+  const diff = deepdiff(
+    {
+      a: 1,
+      b: 2,
+      c: 3,
+    },
+    {
+      c: 3,
+      b: 2,
+      a: 1,
+    },
+  );
   expect(diff).toEqual([]);
 });
 
 it('ignore order of nested object keys', () => {
-  const diff = deepdiff([
-    1,
-    { a: { d: 1, f: 2 }, b: 2, c: 3 },
-  ], [
-    { c: 3, b: 2, a: { f: 2, d: 1 } },
-    2,
-  ], {
-    prestringify: true,
-  });
+  const diff = deepdiff(
+    [1, { a: { d: 1, f: 2 }, b: 2, c: 3 }],
+    [{ c: 3, b: 2, a: { f: 2, d: 1 } }, 2],
+    {
+      prestringify: true,
+    },
+  );
   expect(diff).toEqual([
     { op: 'delete', path: '/0', oldVal: 1 },
     { op: 'insert', path: '/2', newVal: 2 },
@@ -66,11 +84,7 @@ it('ignore order of nested object keys', () => {
 });
 
 it('allow custom hashObject', () => {
-  const diff = deepdiff([
-    1, 2, 3,
-  ], [
-    4, 5, 6,
-  ], {
+  const diff = deepdiff([1, 2, 3], [4, 5, 6], {
     hashObject: () => '',
   });
   expect(diff).toEqual([]);
